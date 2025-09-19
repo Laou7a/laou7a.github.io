@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>laou7a</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            background: white;
+            border-bottom: 2px solid #e0e0e0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .toolbar-left {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .toolbar-right {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 0;
+            color: #333;
+            font-size: 1.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+        }
+
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .tool-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 25px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .tool-group label {
+            font-weight: 500;
+            color: #555;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .tool-btn {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e0e0e0;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .tool-btn.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .tool-btn:hover {
+            background: #e9ecef;
+        }
+
+        .tool-btn.active:hover {
+            background: linear-gradient(45deg, #5a6fd8, #6a4190);
+        }
+
+        input[type="range"] {
+            width: 80px;
+        }
+
+        input[type="color"] {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        select {
+            padding: 6px 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            font-size: 13px;
+        }
+
+        input[type="number"] {
+            padding: 6px 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: none;
+            align-items: flex-start;
+        }
+
+        .canvas-container {
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            overflow: visible;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            padding: 10px;
+            margin: 0 auto;
+            width: fit-content;
+            height: fit-content;
+        }
+
+        canvas {
+            display: block;
+            cursor: crosshair;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 25px;
+            color: #666;
+            font-weight: 500;
+            font-size: 14px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .recording {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            border-color: #90EE90;
+        }
+
+        .playing {
+            background: #e8f0ff;
+            color: #1a365d;
+            border-color: #87CEEB;
+        }
+
+        #svgPanel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            min-width: 300px;
+            max-width: 350px;
+            height: fit-content;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        #svgPanel h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        #svgPanel h4 {
+            margin: 0 0 10px 0;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .svg-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .svg-item:hover {
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .svg-item.selected {
+            border-color: #667eea;
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .svg-item-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .svg-controls {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .control-row label {
+            min-width: 70px;
+            font-weight: 500;
+            color: #555;
+            font-size: 13px;
+        }
+
+        .control-row input[type="range"] {
+            flex: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .canvas-area {
+                flex-direction: column;
+            }
+            
+            #svgPanel {
+                max-width: none;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .toolbar-left, .toolbar-right {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .tool-group {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <h1>🎨 laou7a</h1>
+            
+            <div class="tool-group">
+                <label>Canvas:</label>
+                <select id="canvasRatio">
+                    <option value="16:10">16:10</option>
+                    <option value="16:9">16:9</option>
+                    <option value="4:3">4:3</option>
+                    <option value="1:1">1:1</option>
+                    <option value="3:4">3:4</option>
+                    <option value="9:16">9:16</option>
+                    <option value="custom">Custom</option>
+                </select>
+                <input type="number" id="canvasWidth" placeholder="W" value="800" min="200" max="2000" style="width: 60px; display: none;">
+                <span style="display: none;" id="customX">×</span>
+                <input type="number" id="canvasHeight" placeholder="H" value="500" min="200" max="2000" style="width: 60px; display: none;">
+                <button id="applyCanvas">Apply</button>
+            </div>
+            
+            <div class="tool-group">
+                <label>Tool:</label>
+                <button id="drawToolBtn" class="tool-btn active">✏️ Draw</button>
+                <button id="moveToolBtn" class="tool-btn">🔄 Move</button>
+            </div>
+        </div>
+        
+        <div class="toolbar-right">
+            <div class="tool-group">
+                <button id="recordBtn">Start Recording</button>
+                <button id="playBtn" disabled>Play</button>
+                <button id="pauseBtn" disabled>Pause</button>
+                <button id="clearBtn">Clear</button>
+            </div>
+            
+            <div class="tool-group">
+                <button id="exportImageBtn">Export Image</button>
+                <button id="exportVideoBtn" disabled>Export Video</button>
+            </div>
+            
+            <div class="tool-group">
+                <input type="file" id="svgImport" accept=".svg" style="display: none;">
+                <button id="importBtn">Import SVG</button>
+                <button id="clearAllSvgBtn" disabled>Clear SVGs</button>
+            </div>
+            
+            <div class="tool-group">
+                <label>Color:</label>
+                <input type="color" id="colorPicker" value="#333333">
+                <label>Size:</label>
+                <input type="range" id="brushSize" min="1" max="50" value="5">
+                <span id="brushSizeDisplay">5px</span>
+            </div>
+            
+            <div class="tool-group">
+                <label>Speed:</label>
+                <input type="range" id="playbackSpeed" min="0.25" max="3" step="0.25" value="1">
+                <span id="speedDisplay">1x</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="canvas-area">
+            <!-- Canvas Container -->
+            <div class="canvas-container">
+                <canvas id="drawingCanvas" width="800" height="500"></canvas>
+            </div>
+
+            <!-- SVG Management Panel -->
+            <div id="svgPanel" style="display: none;">
+                <h3>📁 SVG Layers</h3>
+                <div id="svgList"></div>
+                <div class="svg-controls" id="svgControls" style="display: none;">
+                    <h4 id="selectedSvgName">No SVG Selected</h4>
+                    <div class="control-row">
+                        <label>Position X:</label>
+                        <input type="range" id="svgPosX" min="-400" max="400" value="0">
+                    </div>
+                    <div class="control-row">
+                        <label>Position Y:</label>
+                        <input type="range" id="svgPosY" min="-300" max="300" value="0">
+                    </div>
+                    <div class="control-row">
+                        <label>Scale:</label>
+                        <input type="range" id="svgScale" min="0.1" max="3" step="0.1" value="0.8">
+                        <span id="scaleDisplay">0.8x</span>
+                    </div>
+                    <div class="control-row">
+                        <label>Opacity:</label>
+                        <input type="range" id="svgOpacity" min="0.1" max="1" step="0.1" value="0.4">
+                        <span id="opacityDisplay">40%</span>
+                    </div>
+                    <button id="deleteSvgBtn" style="background: #e74c3c;">Delete Selected SVG</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status" id="status">
+            Ready to draw! Click "Start Recording" to begin capturing your drawing.
+        </div>
+    </div>
+
+    <script>
+        class Laou7a {
+            constructor() {
+                this.canvas = document.getElementById('drawingCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.isDrawing = false;
+                this.isRecording = false;
+                this.isPlaying = false;
+                this.strokes = [];
+                this.currentStroke = null;
+                this.playbackIndex = 0;
+                this.playbackTimeout = null;
+                this.playbackSpeed = 1;
+                this.currentTool = 'draw';
+                this.svgLayers = [];
+                this.selectedSvgIndex = -1;
+                this.isDraggingSvg = false;
+                this.isResizingSvg = false;
+                this.resizeHandle = null; // 'nw', 'ne', 'sw', 'se' for corners
+                this.selectionBounds = null;
+                this.canvasWidth = 800;
+                this.canvasHeight = 500;
+                this.exportCanvas = null; // Separate canvas for export
+                this.exportCtx = null;
+                
+                this.setupCanvas();
+                this.setupEventListeners();
+                this.updateStatus('Ready to draw! Click "Start Recording" to begin capturing your drawing.');
+                
+                // Add window resize listener to adjust canvas size
+                window.addEventListener('resize', () => {
+                    setTimeout(() => this.resizeCanvas(), 100); // Small delay to ensure layout is complete
+                });
+            }
+
+            setupCanvas() {
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+                this.resizeCanvas();
+                
+                // Create export canvas
+                this.exportCanvas = document.createElement('canvas');
+                this.exportCtx = this.exportCanvas.getContext('2d');
+                this.exportCtx.lineCap = 'round';
+                this.exportCtx.lineJoin = 'round';
+            }
+
+            resizeCanvas() {
+                // Get available space in the viewport
+                const toolbar = document.querySelector('.toolbar');
+                const status = document.querySelector('.status');
+                const toolbarHeight = toolbar.offsetHeight;
+                const statusHeight = status.offsetHeight;
+                const svgPanel = document.getElementById('svgPanel');
+                const svgPanelWidth = svgPanel.style.display === 'none' ? 0 : 350; // Panel width when visible
+                
+                // Calculate available space for canvas
+                const availableWidth = window.innerWidth - svgPanelWidth - 80; // Account for panel and padding
+                const availableHeight = window.innerHeight - toolbarHeight - statusHeight - 80; // Account for toolbar, status, and padding
+                
+                // Calculate display size while maintaining aspect ratio and fitting in available space
+                const aspectRatio = this.canvasWidth / this.canvasHeight;
+                
+                let displayWidth = Math.min(this.canvasWidth, availableWidth);
+                let displayHeight = displayWidth / aspectRatio;
+                
+                // If height is too tall, scale down based on height constraint
+                if (displayHeight > availableHeight) {
+                    displayHeight = availableHeight;
+                    displayWidth = displayHeight * aspectRatio;
+                }
+                
+                // Set canvas size (actual resolution)
+                this.canvas.width = this.canvasWidth;
+                this.canvas.height = this.canvasHeight;
+                
+                // Set display size (visual size)
+                this.canvas.style.width = displayWidth + 'px';
+                this.canvas.style.height = displayHeight + 'px';
+                
+                // Resize the canvas container to fit the canvas exactly
+                const canvasContainer = document.querySelector('.canvas-container');
+                canvasContainer.style.width = (displayWidth + 20) + 'px'; // Add padding for border
+                canvasContainer.style.height = (displayHeight + 20) + 'px'; // Add padding for border
+                
+                // Update context settings
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+                
+                // Redraw everything
+                this.redrawCanvas();
+            }
+
+            setupEventListeners() {
+                // Canvas events
+                this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+                this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
+                this.canvas.addEventListener('mouseout', () => this.handleMouseUp());
+
+                // Touch events
+                this.canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const mouseEvent = new MouseEvent('mousedown', {
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
+                    });
+                    this.canvas.dispatchEvent(mouseEvent);
+                });
+
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const mouseEvent = new MouseEvent('mousemove', {
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
+                    });
+                    this.canvas.dispatchEvent(mouseEvent);
+                });
+
+                this.canvas.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    const mouseEvent = new MouseEvent('mouseup', {});
+                    this.canvas.dispatchEvent(mouseEvent);
+                });
+
+                // Tool buttons
+                document.getElementById('drawToolBtn').addEventListener('click', () => this.setTool('draw'));
+                document.getElementById('moveToolBtn').addEventListener('click', () => this.setTool('move'));
+
+                // Control buttons
+                document.getElementById('recordBtn').addEventListener('click', () => this.toggleRecording());
+                document.getElementById('playBtn').addEventListener('click', () => this.playAnimation());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.pauseAnimation());
+                document.getElementById('clearBtn').addEventListener('click', () => this.clearCanvas());
+
+                // Brush controls
+                document.getElementById('brushSize').addEventListener('input', (e) => {
+                    document.getElementById('brushSizeDisplay').textContent = e.target.value + 'px';
+                });
+
+                document.getElementById('playbackSpeed').addEventListener('input', (e) => {
+                    this.playbackSpeed = parseFloat(e.target.value);
+                    document.getElementById('speedDisplay').textContent = e.target.value + 'x';
+                });
+
+                // SVG controls
+                document.getElementById('importBtn').addEventListener('click', () => {
+                    document.getElementById('svgImport').click();
+                });
+
+                document.getElementById('svgImport').addEventListener('change', (e) => {
+                    this.handleSvgImport(e);
+                });
+
+                document.getElementById('clearAllSvgBtn').addEventListener('click', () => {
+                    this.clearAllSvgs();
+                });
+
+                document.getElementById('svgPosX').addEventListener('input', (e) => {
+                    this.updateSelectedSvgTransform('userOffsetX', parseFloat(e.target.value));
+                });
+
+                document.getElementById('svgPosY').addEventListener('input', (e) => {
+                    this.updateSelectedSvgTransform('userOffsetY', parseFloat(e.target.value));
+                });
+
+                document.getElementById('svgScale').addEventListener('input', (e) => {
+                    this.updateSelectedSvgTransform('userScale', parseFloat(e.target.value));
+                    document.getElementById('scaleDisplay').textContent = e.target.value + 'x';
+                });
+
+                document.getElementById('svgOpacity').addEventListener('input', (e) => {
+                    this.updateSelectedSvgTransform('opacity', parseFloat(e.target.value));
+                    document.getElementById('opacityDisplay').textContent = Math.round(e.target.value * 100) + '%';
+                });
+
+                document.getElementById('deleteSvgBtn').addEventListener('click', () => {
+                    this.deleteSelectedSvg();
+                });
+
+                // Canvas ratio controls
+                document.getElementById('canvasRatio').addEventListener('change', (e) => {
+                    this.handleRatioChange(e.target.value);
+                });
+
+                document.getElementById('applyCanvas').addEventListener('click', () => {
+                    this.applyCanvasSize();
+                });
+
+                document.getElementById('canvasWidth').addEventListener('input', () => {
+                    this.updateCanvasSizeFromInputs();
+                });
+
+                document.getElementById('canvasHeight').addEventListener('input', () => {
+                    this.updateCanvasSizeFromInputs();
+                });
+
+                // Export controls
+                document.getElementById('exportImageBtn').addEventListener('click', () => {
+                    this.exportImage();
+                });
+
+                document.getElementById('exportVideoBtn').addEventListener('click', () => {
+                    this.exportVideo();
+                });
+            }
+
+            setTool(tool) {
+                this.currentTool = tool;
+                
+                document.getElementById('drawToolBtn').classList.toggle('active', tool === 'draw');
+                document.getElementById('moveToolBtn').classList.toggle('active', tool === 'move');
+                
+                document.getElementById('svgPanel').style.display = tool === 'move' ? 'block' : 'none';
+                
+                // Clear selection when switching to draw mode
+                if (tool === 'draw') {
+                    this.selectedSvgIndex = -1;
+                    this.selectSvg(-1);
+                }
+                
+                this.updateCursor();
+                
+                // Resize canvas to account for panel visibility change
+                setTimeout(() => this.resizeCanvas(), 100);
+                
+                this.updateStatus(tool === 'draw' ? 'Draw mode: Click and drag to draw' : 'Move mode: Click SVGs to select, drag to move, use corner handles to resize');
+            }
+
+            getMousePos(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                
+                return {
+                    x: (e.clientX - rect.left) * scaleX,
+                    y: (e.clientY - rect.top) * scaleY
+                };
+            }
+
+            handleMouseDown(e) {
+                if (this.isPlaying) return;
+                
+                if (this.currentTool === 'draw') {
+                    this.startDrawing(e);
+                } else if (this.currentTool === 'move') {
+                    this.startMovingSvg(e);
+                }
+            }
+
+            handleMouseMove(e) {
+                if (this.isPlaying) return;
+                
+                if (this.currentTool === 'draw') {
+                    this.draw(e);
+                } else if (this.currentTool === 'move') {
+                    this.moveSvg(e);
+                }
+            }
+
+            handleMouseUp() {
+                if (this.currentTool === 'draw') {
+                    this.stopDrawing();
+                } else if (this.currentTool === 'move') {
+                    this.stopMovingSvg();
+                }
+            }
+
+            startDrawing(e) {
+                if (this.isPlaying) return;
+                
+                this.isDrawing = true;
+                const pos = this.getMousePos(e);
+                
+                const color = document.getElementById('colorPicker').value;
+                const size = parseInt(document.getElementById('brushSize').value);
+                
+                if (this.isRecording) {
+                    this.currentStroke = {
+                        points: [{ x: pos.x, y: pos.y, timestamp: Date.now() }],
+                        color: color,
+                        size: size
+                    };
+                }
+
+                this.redrawCanvas();
+                
+                this.ctx.strokeStyle = color;
+                this.ctx.lineWidth = size;
+                this.ctx.beginPath();
+                this.ctx.moveTo(pos.x, pos.y);
+            }
+
+            draw(e) {
+                if (!this.isDrawing || this.isPlaying) return;
+
+                const pos = this.getMousePos(e);
+                
+                if (this.isRecording && this.currentStroke) {
+                    this.currentStroke.points.push({ 
+                        x: pos.x, 
+                        y: pos.y, 
+                        timestamp: Date.now() 
+                    });
+                }
+
+                this.ctx.lineTo(pos.x, pos.y);
+                this.ctx.stroke();
+            }
+
+            stopDrawing() {
+                if (!this.isDrawing) return;
+                
+                this.isDrawing = false;
+                
+                if (this.isRecording && this.currentStroke) {
+                    this.strokes.push(this.currentStroke);
+                    this.currentStroke = null;
+                    this.updateStatus(`Recording... ${this.strokes.length} stroke${this.strokes.length !== 1 ? 's' : ''} captured.`);
+                }
+            }
+
+            startMovingSvg(e) {
+                const pos = this.getMousePos(e);
+                
+                // Check if clicking on a resize handle first
+                if (this.selectedSvgIndex >= 0) {
+                    const handle = this.getResizeHandle(pos);
+                    if (handle) {
+                        this.isResizingSvg = true;
+                        this.resizeHandle = handle;
+                        this.dragStartX = pos.x;
+                        this.dragStartY = pos.y;
+                        
+                        const svg = this.svgLayers[this.selectedSvgIndex];
+                        this.dragStartBounds = this.getSvgBounds(svg);
+                        this.dragStartScale = svg.userScale;
+                        
+                        this.canvas.style.cursor = this.getResizeCursor(handle);
+                        return;
+                    }
+                }
+                
+                // Find which SVG was clicked (from top to bottom)
+                for (let i = this.svgLayers.length - 1; i >= 0; i--) {
+                    const svg = this.svgLayers[i];
+                    if (this.isPointInSvg(pos, svg)) {
+                        this.selectedSvgIndex = i;
+                        this.isDraggingSvg = true;
+                        this.dragStartX = pos.x;
+                        this.dragStartY = pos.y;
+                        this.dragStartOffsetX = svg.userOffsetX;
+                        this.dragStartOffsetY = svg.userOffsetY;
+                        this.selectSvg(i);
+                        this.canvas.style.cursor = 'grabbing';
+                        break;
+                    }
+                }
+            }
+
+            getResizeCursor(handle) {
+                switch (handle) {
+                    case 'nw':
+                    case 'se':
+                        return 'nw-resize';
+                    case 'ne':
+                    case 'sw':
+                        return 'ne-resize';
+                    default:
+                        return 'grab';
+                }
+            }
+
+            moveSvg(e) {
+                if (this.selectedSvgIndex === -1) return;
+                
+                const pos = this.getMousePos(e);
+                const svg = this.svgLayers[this.selectedSvgIndex];
+                
+                if (this.isResizingSvg) {
+                    // Handle resizing
+                    const deltaX = pos.x - this.dragStartX;
+                    const deltaY = pos.y - this.dragStartY;
+                    
+                    // Calculate scale change based on handle direction
+                    let scaleChange = 0;
+                    const sensitivity = 0.003;
+                    
+                    switch (this.resizeHandle) {
+                        case 'nw':
+                            scaleChange = -(deltaX + deltaY) * sensitivity;
+                            break;
+                        case 'ne':
+                            scaleChange = (deltaX - deltaY) * sensitivity;
+                            break;
+                        case 'sw':
+                            scaleChange = (-deltaX + deltaY) * sensitivity;
+                            break;
+                        case 'se':
+                            scaleChange = (deltaX + deltaY) * sensitivity;
+                            break;
+                    }
+                    
+                    const newScale = Math.max(0.1, Math.min(3, this.dragStartScale + scaleChange));
+                    svg.userScale = newScale;
+                    
+                    this.updateSvgTransform(svg);
+                    this.updateSvgControls(svg);
+                    
+                } else if (this.isDraggingSvg) {
+                    // Handle moving
+                    const deltaX = pos.x - this.dragStartX;
+                    const deltaY = pos.y - this.dragStartY;
+                    
+                    svg.userOffsetX = this.dragStartOffsetX + deltaX;
+                    svg.userOffsetY = this.dragStartOffsetY + deltaY;
+                    
+                    this.updateSvgTransform(svg);
+                    this.updateSvgControls(svg);
+                }
+                
+                this.redrawCanvas();
+            }
+
+            stopMovingSvg() {
+                this.isDraggingSvg = false;
+                this.isResizingSvg = false;
+                this.resizeHandle = null;
+                this.updateCursor();
+            }
+
+            updateCursor() {
+                if (this.currentTool === 'move' && this.selectedSvgIndex >= 0) {
+                    // Check if hovering over resize handle
+                    this.canvas.addEventListener('mousemove', this.handleHoverCursor.bind(this));
+                    this.canvas.style.cursor = 'grab';
+                } else {
+                    this.canvas.style.cursor = this.currentTool === 'draw' ? 'crosshair' : 'grab';
+                }
+            }
+
+            handleHoverCursor(e) {
+                if (this.currentTool !== 'move' || this.isDraggingSvg || this.isResizingSvg) return;
+                
+                const pos = this.getMousePos(e);
+                const handle = this.getResizeHandle(pos);
+                
+                if (handle) {
+                    this.canvas.style.cursor = this.getResizeCursor(handle);
+                } else if (this.selectedSvgIndex >= 0 && this.isPointInSvg(pos, this.svgLayers[this.selectedSvgIndex])) {
+                    this.canvas.style.cursor = 'grab';
+                } else {
+                    this.canvas.style.cursor = 'default';
+                }
+            }
+
+            isPointInSvg(point, svg) {
+                const left = svg.offsetX;
+                const top = svg.offsetY;
+                const right = left + svg.baseSvgWidth * svg.scale;
+                const bottom = top + svg.baseSvgHeight * svg.scale;
+                
+                return point.x >= left && point.x <= right && point.y >= top && point.y <= bottom;
+            }
+
+            toggleRecording() {
+                const recordBtn = document.getElementById('recordBtn');
+                const playBtn = document.getElementById('playBtn');
+                
+                if (this.isRecording) {
+                    this.isRecording = false;
+                    recordBtn.textContent = 'Start Recording';
+                    playBtn.disabled = this.strokes.length === 0;
+                    document.getElementById('exportVideoBtn').disabled = this.strokes.length === 0;
+                    this.updateStatus(`Recording stopped. ${this.strokes.length} stroke${this.strokes.length !== 1 ? 's' : ''} captured.`);
+                } else {
+                    this.isRecording = true;
+                    this.strokes = [];
+                    recordBtn.textContent = 'Stop Recording';
+                    playBtn.disabled = true;
+                    document.getElementById('exportVideoBtn').disabled = true;
+                    this.updateStatus('Recording started! Draw on the canvas.');
+                }
+            }
+
+            async playAnimation() {
+                if (this.strokes.length === 0 || this.isPlaying) return;
+
+                this.isPlaying = true;
+                this.playbackIndex = 0;
+                
+                document.getElementById('playBtn').disabled = true;
+                document.getElementById('pauseBtn').disabled = false;
+                document.getElementById('recordBtn').disabled = true;
+                
+                this.clearCanvasOnly();
+                this.drawAllSvgs();
+                this.updateStatus('Playing animation...', 'playing');
+
+                await this.animateStrokes();
+            }
+
+            async animateStrokes() {
+                for (let strokeIndex = 0; strokeIndex < this.strokes.length && this.isPlaying; strokeIndex++) {
+                    const stroke = this.strokes[strokeIndex];
+                    
+                    this.ctx.strokeStyle = stroke.color;
+                    this.ctx.lineWidth = stroke.size;
+                    this.ctx.beginPath();
+                    
+                    if (stroke.points.length > 0) {
+                        this.ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                        
+                        for (let pointIndex = 1; pointIndex < stroke.points.length && this.isPlaying; pointIndex++) {
+                            const currentPoint = stroke.points[pointIndex];
+                            const prevPoint = stroke.points[pointIndex - 1];
+                            
+                            const originalDelay = currentPoint.timestamp - prevPoint.timestamp;
+                            const adjustedDelay = Math.max(1, originalDelay / this.playbackSpeed);
+                            
+                            await new Promise(resolve => {
+                                this.playbackTimeout = setTimeout(() => {
+                                    if (this.isPlaying) {
+                                        this.clearCanvasOnly();
+                                        this.drawAllSvgs();
+                                        
+                                        for (let s = 0; s < strokeIndex; s++) {
+                                            const prevStroke = this.strokes[s];
+                                            this.ctx.strokeStyle = prevStroke.color;
+                                            this.ctx.lineWidth = prevStroke.size;
+                                            this.ctx.beginPath();
+                                            this.ctx.moveTo(prevStroke.points[0].x, prevStroke.points[0].y);
+                                            for (let p = 1; p < prevStroke.points.length; p++) {
+                                                this.ctx.lineTo(prevStroke.points[p].x, prevStroke.points[p].y);
+                                            }
+                                            this.ctx.stroke();
+                                        }
+                                        
+                                        this.ctx.strokeStyle = stroke.color;
+                                        this.ctx.lineWidth = stroke.size;
+                                        this.ctx.beginPath();
+                                        this.ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                                        for (let p = 1; p <= pointIndex; p++) {
+                                            this.ctx.lineTo(stroke.points[p].x, stroke.points[p].y);
+                                        }
+                                        this.ctx.stroke();
+                                    }
+                                    resolve();
+                                }, adjustedDelay);
+                            });
+                        }
+                    }
+                    
+                    if (this.isPlaying && strokeIndex < this.strokes.length - 1) {
+                        await new Promise(resolve => {
+                            this.playbackTimeout = setTimeout(resolve, 100 / this.playbackSpeed);
+                        });
+                    }
+                }
+
+                if (this.isPlaying) {
+                    this.finishPlayback();
+                }
+            }
+
+            pauseAnimation() {
+                this.isPlaying = false;
+                if (this.playbackTimeout) {
+                    clearTimeout(this.playbackTimeout);
+                }
+                
+                document.getElementById('playBtn').disabled = false;
+                document.getElementById('pauseBtn').disabled = true;
+                document.getElementById('recordBtn').disabled = false;
+                
+                this.updateStatus('Animation paused.');
+            }
+
+            finishPlayback() {
+                this.isPlaying = false;
+                
+                document.getElementById('playBtn').disabled = false;
+                document.getElementById('pauseBtn').disabled = true;
+                document.getElementById('recordBtn').disabled = false;
+                
+                this.updateStatus(`Animation complete! ${this.strokes.length} stroke${this.strokes.length !== 1 ? 's' : ''} played back.`);
+            }
+
+            clearCanvas() {
+                this.clearCanvasOnly();
+                this.strokes = [];
+                this.isRecording = false;
+                this.isPlaying = false;
+                
+                if (this.playbackTimeout) {
+                    clearTimeout(this.playbackTimeout);
+                }
+                
+                document.getElementById('recordBtn').textContent = 'Start Recording';
+                document.getElementById('playBtn').disabled = true;
+                document.getElementById('pauseBtn').disabled = true;
+                document.getElementById('recordBtn').disabled = false;
+                document.getElementById('exportVideoBtn').disabled = true;
+                
+                this.redrawCanvas();
+                
+                this.updateStatus('Canvas cleared. Ready to draw!');
+            }
+
+            clearCanvasOnly() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            redrawCanvas() {
+                this.clearCanvasOnly();
+                this.drawAllSvgs();
+                
+                this.strokes.forEach(stroke => {
+                    if (stroke.points.length > 0) {
+                        this.ctx.strokeStyle = stroke.color;
+                        this.ctx.lineWidth = stroke.size;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                        
+                        for (let i = 1; i < stroke.points.length; i++) {
+                            this.ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                        }
+                        this.ctx.stroke();
+                    }
+                });
+            }
+
+            drawAllSvgs() {
+                this.svgLayers.forEach(svg => {
+                    this.drawSvg(svg);
+                });
+                
+                // Draw selection frame if an SVG is selected in move mode
+                if (this.currentTool === 'move' && this.selectedSvgIndex >= 0) {
+                    this.drawSelectionFrame();
+                }
+            }
+
+            drawSvg(svg) {
+                this.ctx.save();
+                this.ctx.translate(svg.offsetX, svg.offsetY);
+                this.ctx.scale(svg.scale, svg.scale);
+                this.ctx.globalAlpha = svg.opacity;
+                
+                svg.paths.forEach(pathInfo => {
+                    const path2D = new Path2D(pathInfo.pathData);
+                    this.ctx.strokeStyle = pathInfo.stroke;
+                    this.ctx.lineWidth = pathInfo.strokeWidth;
+                    this.ctx.stroke(path2D);
+                });
+                
+                this.ctx.restore();
+            }
+
+            drawSelectionFrame() {
+                if (this.selectedSvgIndex < 0 || this.selectedSvgIndex >= this.svgLayers.length) return;
+                
+                const svg = this.svgLayers[this.selectedSvgIndex];
+                const bounds = this.getSvgBounds(svg);
+                this.selectionBounds = bounds;
+                
+                this.ctx.save();
+                this.ctx.strokeStyle = '#667eea';
+                this.ctx.lineWidth = 2;
+                this.ctx.setLineDash([5, 5]);
+                
+                // Draw selection rectangle
+                this.ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+                
+                // Draw resize handles
+                this.ctx.setLineDash([]);
+                this.ctx.fillStyle = '#667eea';
+                this.ctx.strokeStyle = '#ffffff';
+                this.ctx.lineWidth = 1;
+                
+                const handleSize = 8;
+                const handles = [
+                    { x: bounds.x - handleSize/2, y: bounds.y - handleSize/2, type: 'nw' },
+                    { x: bounds.x + bounds.width - handleSize/2, y: bounds.y - handleSize/2, type: 'ne' },
+                    { x: bounds.x - handleSize/2, y: bounds.y + bounds.height - handleSize/2, type: 'sw' },
+                    { x: bounds.x + bounds.width - handleSize/2, y: bounds.y + bounds.height - handleSize/2, type: 'se' }
+                ];
+                
+                handles.forEach(handle => {
+                    this.ctx.fillRect(handle.x, handle.y, handleSize, handleSize);
+                    this.ctx.strokeRect(handle.x, handle.y, handleSize, handleSize);
+                });
+                
+                this.ctx.restore();
+            }
+
+            getSvgBounds(svg) {
+                return {
+                    x: svg.offsetX,
+                    y: svg.offsetY,
+                    width: svg.baseSvgWidth * svg.scale,
+                    height: svg.baseSvgHeight * svg.scale
+                };
+            }
+
+            getResizeHandle(point) {
+                if (!this.selectionBounds) return null;
+                
+                const handleSize = 8;
+                const handles = [
+                    { x: this.selectionBounds.x - handleSize/2, y: this.selectionBounds.y - handleSize/2, type: 'nw' },
+                    { x: this.selectionBounds.x + this.selectionBounds.width - handleSize/2, y: this.selectionBounds.y - handleSize/2, type: 'ne' },
+                    { x: this.selectionBounds.x - handleSize/2, y: this.selectionBounds.y + this.selectionBounds.height - handleSize/2, type: 'sw' },
+                    { x: this.selectionBounds.x + this.selectionBounds.width - handleSize/2, y: this.selectionBounds.y + this.selectionBounds.height - handleSize/2, type: 'se' }
+                ];
+                
+                for (let handle of handles) {
+                    if (point.x >= handle.x && point.x <= handle.x + handleSize &&
+                        point.y >= handle.y && point.y <= handle.y + handleSize) {
+                        return handle.type;
+                    }
+                }
+                
+                return null;
+            }
+
+            updateStatus(message, className = '') {
+                const status = document.getElementById('status');
+                status.textContent = message;
+                status.className = 'status ' + className;
+            }
+
+            async handleSvgImport(event) {
+                const file = event.target.files[0];
+                if (!file || file.type !== 'image/svg+xml') {
+                    this.updateStatus('Please select a valid SVG file.');
+                    return;
+                }
+
+                try {
+                    const svgText = await file.text();
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                    
+                    if (svgDoc.querySelector('parsererror')) {
+                        throw new Error('Invalid SVG file');
+                    }
+
+                    const svgElement = svgDoc.documentElement;
+                    const svgLayer = this.createSvgLayer(svgElement, file.name);
+                    
+                    this.svgLayers.push(svgLayer);
+                    this.updateSvgList();
+                    this.redrawCanvas();
+                    
+                    document.getElementById('clearAllSvgBtn').disabled = false;
+                    this.updateStatus(`SVG "${file.name}" imported! Switch to Move tool to adjust position.`);
+                    
+                    event.target.value = '';
+                    
+                } catch (error) {
+                    this.updateStatus('Error importing SVG: ' + error.message);
+                }
+            }
+
+            createSvgLayer(svgElement, filename) {
+                const paths = [];
+                const pathElements = svgElement.querySelectorAll('path, line, polyline, polygon, circle, ellipse, rect');
+                
+                pathElements.forEach(element => {
+                    const pathData = this.elementToPathData(element);
+                    if (pathData) {
+                        const stroke = element.getAttribute('stroke') || '#000000';
+                        const strokeWidth = parseFloat(element.getAttribute('stroke-width') || '2');
+                        
+                        paths.push({
+                            pathData: pathData,
+                            stroke: stroke,
+                            strokeWidth: strokeWidth
+                        });
+                    }
+                });
+
+                const viewBox = svgElement.getAttribute('viewBox');
+                let baseSvgWidth = parseFloat(svgElement.getAttribute('width')) || 800;
+                let baseSvgHeight = parseFloat(svgElement.getAttribute('height')) || 500;
+                
+                if (viewBox) {
+                    const parts = viewBox.split(' ').map(parseFloat);
+                    if (parts.length === 4) {
+                        baseSvgWidth = parts[2];
+                        baseSvgHeight = parts[3];
+                    }
+                }
+
+                const svgLayer = {
+                    id: Date.now(),
+                    name: filename,
+                    element: svgElement,
+                    paths: paths,
+                    baseSvgWidth: baseSvgWidth,
+                    baseSvgHeight: baseSvgHeight,
+                    userOffsetX: 0,
+                    userOffsetY: 0,
+                    userScale: 0.8,
+                    opacity: 0.4,
+                    offsetX: 0,
+                    offsetY: 0,
+                    scale: 1
+                };
+
+                this.updateSvgTransform(svgLayer);
+                return svgLayer;
+            }
+
+            elementToPathData(element) {
+                const tagName = element.tagName.toLowerCase();
+                
+                switch (tagName) {
+                    case 'path':
+                        return element.getAttribute('d');
+                    
+                    case 'line':
+                        const x1 = parseFloat(element.getAttribute('x1') || 0);
+                        const y1 = parseFloat(element.getAttribute('y1') || 0);
+                        const x2 = parseFloat(element.getAttribute('x2') || 0);
+                        const y2 = parseFloat(element.getAttribute('y2') || 0);
+                        return `M ${x1} ${y1} L ${x2} ${y2}`;
+                    
+                    case 'circle':
+                        const cx = parseFloat(element.getAttribute('cx') || 0);
+                        const cy = parseFloat(element.getAttribute('cy') || 0);
+                        const r = parseFloat(element.getAttribute('r') || 0);
+                        return `M ${cx + r} ${cy} A ${r} ${r} 0 1 1 ${cx - r} ${cy} A ${r} ${r} 0 1 1 ${cx + r} ${cy}`;
+                    
+                    case 'rect':
+                        const x = parseFloat(element.getAttribute('x') || 0);
+                        const y = parseFloat(element.getAttribute('y') || 0);
+                        const width = parseFloat(element.getAttribute('width') || 0);
+                        const height = parseFloat(element.getAttribute('height') || 0);
+                        return `M ${x} ${y} L ${x + width} ${y} L ${x + width} ${y + height} L ${x} ${y + height} Z`;
+                    
+                    case 'polyline':
+                    case 'polygon':
+                        const points = element.getAttribute('points') || '';
+                        const coords = points.trim().split(/[\s,]+/).filter(p => p);
+                        if (coords.length < 4) return null;
+                        
+                        let path = `M ${coords[0]} ${coords[1]}`;
+                        for (let i = 2; i < coords.length; i += 2) {
+                            path += ` L ${coords[i]} ${coords[i + 1]}`;
+                        }
+                        if (tagName === 'polygon') path += ' Z';
+                        return path;
+                    
+                    default:
+                        return null;
+                }
+            }
+
+            updateSvgList() {
+                const svgList = document.getElementById('svgList');
+                svgList.innerHTML = '';
+                
+                this.svgLayers.forEach((svg, index) => {
+                    const svgItem = document.createElement('div');
+                    svgItem.className = 'svg-item';
+                    if (index === this.selectedSvgIndex) {
+                        svgItem.classList.add('selected');
+                    }
+                    
+                    svgItem.innerHTML = `
+                        <span class="svg-item-name">📄 ${svg.name}</span>
+                        <div class="svg-item-actions">
+                            <button>Select</button>
+                        </div>
+                    `;
+                    
+                    svgItem.addEventListener('click', () => this.selectSvg(index));
+                    svgList.appendChild(svgItem);
+                });
+            }
+
+            selectSvg(index) {
+                this.selectedSvgIndex = index;
+                this.updateSvgList();
+                
+                if (index >= 0 && index < this.svgLayers.length) {
+                    const svg = this.svgLayers[index];
+                    this.updateSvgControls(svg);
+                    document.getElementById('svgControls').style.display = 'block';
+                    document.getElementById('selectedSvgName').textContent = `✏️ ${svg.name}`;
+                } else {
+                    document.getElementById('svgControls').style.display = 'none';
+                    document.getElementById('selectedSvgName').textContent = 'No SVG Selected';
+                }
+                
+                // Redraw to show selection frame
+                this.redrawCanvas();
+            }
+
+            updateSvgControls(svg) {
+                document.getElementById('svgPosX').value = svg.userOffsetX;
+                document.getElementById('svgPosY').value = svg.userOffsetY;
+                document.getElementById('svgScale').value = svg.userScale;
+                document.getElementById('scaleDisplay').textContent = svg.userScale + 'x';
+                document.getElementById('svgOpacity').value = svg.opacity;
+                document.getElementById('opacityDisplay').textContent = Math.round(svg.opacity * 100) + '%';
+            }
+
+            updateSelectedSvgTransform(property, value) {
+                if (this.selectedSvgIndex >= 0 && this.selectedSvgIndex < this.svgLayers.length) {
+                    const svg = this.svgLayers[this.selectedSvgIndex];
+                    svg[property] = value;
+                    this.updateSvgTransform(svg);
+                    this.redrawCanvas();
+                }
+            }
+
+            updateSvgTransform(svg) {
+                const baseScale = Math.min(this.canvasWidth / svg.baseSvgWidth, this.canvasHeight / svg.baseSvgHeight);
+                
+                svg.scale = baseScale * svg.userScale;
+                
+                const baseCenterX = (this.canvasWidth - svg.baseSvgWidth * svg.scale) / 2;
+                const baseCenterY = (this.canvasHeight - svg.baseSvgHeight * svg.scale) / 2;
+                
+                svg.offsetX = baseCenterX + svg.userOffsetX;
+                svg.offsetY = baseCenterY + svg.userOffsetY;
+            }
+
+            deleteSelectedSvg() {
+                if (this.selectedSvgIndex >= 0 && this.selectedSvgIndex < this.svgLayers.length) {
+                    this.svgLayers.splice(this.selectedSvgIndex, 1);
+                    this.selectedSvgIndex = -1;
+                    this.updateSvgList();
+                    this.selectSvg(-1);
+                    this.redrawCanvas();
+                    
+                    if (this.svgLayers.length === 0) {
+                        document.getElementById('clearAllSvgBtn').disabled = true;
+                    }
+                    
+                    this.updateStatus('SVG deleted.');
+                }
+            }
+
+            clearAllSvgs() {
+                this.svgLayers = [];
+                this.selectedSvgIndex = -1;
+                this.updateSvgList();
+                this.selectSvg(-1);
+                this.redrawCanvas();
+                
+                document.getElementById('clearAllSvgBtn').disabled = true;
+                this.updateStatus('All SVGs cleared.');
+            }
+
+            handleRatioChange(ratio) {
+                const widthInput = document.getElementById('canvasWidth');
+                const heightInput = document.getElementById('canvasHeight');
+                const customX = document.getElementById('customX');
+                
+                if (ratio === 'custom') {
+                    widthInput.style.display = 'inline';
+                    heightInput.style.display = 'inline';
+                    customX.style.display = 'inline';
+                    widthInput.value = this.canvasWidth;
+                    heightInput.value = this.canvasHeight;
+                } else {
+                    widthInput.style.display = 'none';
+                    heightInput.style.display = 'none';
+                    customX.style.display = 'none';
+                    
+                    // Calculate size based on ratio
+                    const [w, h] = ratio.split(':').map(Number);
+                    const baseWidth = 800;
+                    const aspectRatio = w / h;
+                    
+                    this.canvasWidth = baseWidth;
+                    this.canvasHeight = Math.round(baseWidth / aspectRatio);
+                }
+            }
+
+            updateCanvasSizeFromInputs() {
+                const widthInput = document.getElementById('canvasWidth');
+                const heightInput = document.getElementById('canvasHeight');
+                
+                this.canvasWidth = Math.max(200, Math.min(2000, parseInt(widthInput.value) || 800));
+                this.canvasHeight = Math.max(200, Math.min(2000, parseInt(heightInput.value) || 500));
+                
+                widthInput.value = this.canvasWidth;
+                heightInput.value = this.canvasHeight;
+            }
+
+            applyCanvasSize() {
+                const ratio = document.getElementById('canvasRatio').value;
+                
+                if (ratio === 'custom') {
+                    this.updateCanvasSizeFromInputs();
+                }
+                
+                this.resizeCanvas();
+                
+                // Update all SVG transforms for new canvas size
+                this.svgLayers.forEach(svg => {
+                    this.updateSvgTransform(svg);
+                });
+                
+                this.updateStatus(`Canvas resized to ${this.canvasWidth} × ${this.canvasHeight} pixels`);
+            }
+
+            exportImage() {
+                // Set up export canvas with exact dimensions
+                this.exportCanvas.width = this.canvasWidth;
+                this.exportCanvas.height = this.canvasHeight;
+                
+                // Fill with white background
+                this.exportCtx.fillStyle = '#ffffff';
+                this.exportCtx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+                
+                // Draw all SVGs
+                this.drawAllSvgsToContext(this.exportCtx);
+                
+                // Draw all recorded strokes
+                this.strokes.forEach(stroke => {
+                    if (stroke.points.length > 0) {
+                        this.exportCtx.strokeStyle = stroke.color;
+                        this.exportCtx.lineWidth = stroke.size;
+                        this.exportCtx.beginPath();
+                        this.exportCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                        
+                        for (let i = 1; i < stroke.points.length; i++) {
+                            this.exportCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                        }
+                        this.exportCtx.stroke();
+                    }
+                });
+                
+                // Download the image
+                this.downloadCanvas(this.exportCanvas, 'laou7a-drawing');
+                this.updateStatus('Image exported successfully!');
+            }
+
+            drawAllSvgsToContext(ctx) {
+                this.svgLayers.forEach(svg => {
+                    this.drawSvgToContext(ctx, svg);
+                });
+            }
+
+            drawSvgToContext(ctx, svg) {
+                ctx.save();
+                ctx.translate(svg.offsetX, svg.offsetY);
+                ctx.scale(svg.scale, svg.scale);
+                ctx.globalAlpha = svg.opacity;
+                
+                svg.paths.forEach(pathInfo => {
+                    const path2D = new Path2D(pathInfo.pathData);
+                    ctx.strokeStyle = pathInfo.stroke;
+                    ctx.lineWidth = pathInfo.strokeWidth;
+                    ctx.stroke(path2D);
+                });
+                
+                ctx.restore();
+            }
+
+            async exportVideo() {
+                if (this.strokes.length === 0) {
+                    this.updateStatus('No recording to export!');
+                    return;
+                }
+
+                this.updateStatus('Generating MP4 video... This may take a moment.');
+                
+                try {
+                    // Create video using MediaRecorder API
+                    await this.createMP4Video();
+                    this.updateStatus('MP4 video exported successfully!');
+                } catch (error) {
+                    console.error('Export error:', error);
+                    this.updateStatus('Error exporting video. Please try again.');
+                }
+            }
+
+            async createMP4Video() {
+                // Create a canvas stream for recording
+                const recordCanvas = document.createElement('canvas');
+                recordCanvas.width = this.canvasWidth;
+                recordCanvas.height = this.canvasHeight;
+                const recordCtx = recordCanvas.getContext('2d');
+                recordCtx.lineCap = 'round';
+                recordCtx.lineJoin = 'round';
+
+                // Set up MediaRecorder
+                const stream = recordCanvas.captureStream(30); // 30 FPS
+                const mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm;codecs=vp9' // Will fallback to available codecs
+                });
+
+                const chunks = [];
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        chunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    this.downloadVideoBlob(blob, 'laou7a-animation.webm');
+                };
+
+                // Start recording
+                mediaRecorder.start();
+
+                // Animate the drawing process
+                await this.animateForRecording(recordCtx);
+
+                // Stop recording
+                mediaRecorder.stop();
+            }
+
+            async animateForRecording(ctx) {
+                const frameRate = 30;
+                const frameInterval = 1000 / frameRate;
+                const totalDuration = this.calculateTotalDuration();
+                
+                let currentTime = 0;
+                const startTime = Date.now();
+
+                while (currentTime <= totalDuration) {
+                    // Clear and set background
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+                    
+                    // Draw SVGs
+                    this.drawAllSvgsToContext(ctx);
+                    
+                    // Draw strokes up to current time
+                    this.drawStrokesUpToTime(ctx, currentTime);
+                    
+                    // Wait for next frame
+                    await new Promise(resolve => setTimeout(resolve, frameInterval));
+                    
+                    currentTime += frameInterval;
+                }
+
+                // Hold the final frame for 1 second
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            downloadVideoBlob(blob, filename) {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
+            calculateTotalDuration() {
+                if (this.strokes.length === 0) return 0;
+                
+                let maxTime = 0;
+                this.strokes.forEach(stroke => {
+                    if (stroke.points.length > 0) {
+                        const lastPoint = stroke.points[stroke.points.length - 1];
+                        maxTime = Math.max(maxTime, lastPoint.timestamp);
+                    }
+                });
+                
+                const firstTime = this.strokes[0].points[0].timestamp;
+                return maxTime - firstTime + 1000; // Add 1 second at the end
+            }
+
+            drawStrokesUpToTime(ctx, currentTime) {
+                const startTime = this.strokes.length > 0 ? this.strokes[0].points[0].timestamp : 0;
+                const targetTime = startTime + currentTime;
+                
+                this.strokes.forEach(stroke => {
+                    if (stroke.points.length === 0) return;
+                    
+                    const strokeStartTime = stroke.points[0].timestamp;
+                    if (strokeStartTime > targetTime) return;
+                    
+                    ctx.strokeStyle = stroke.color;
+                    ctx.lineWidth = stroke.size;
+                    ctx.beginPath();
+                    ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                    
+                    for (let i = 1; i < stroke.points.length; i++) {
+                        if (stroke.points[i].timestamp > targetTime) break;
+                        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                    }
+                    
+                    ctx.stroke();
+                });
+            }
+
+            async createGIF(frames) {
+                // Simple GIF creation using canvas toDataURL
+                // For a basic implementation, we'll create a sequence of PNG images
+                // In a real implementation, you might want to use a library like gif.js
+                
+                const zip = this.createZip();
+                
+                frames.forEach((frameData, index) => {
+                    // Create temporary canvas for this frame
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = this.canvasWidth;
+                    tempCanvas.height = this.canvasHeight;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCtx.putImageData(frameData, 0, 0);
+                    
+                    // Convert to data URL and add to zip
+                    const dataURL = tempCanvas.toDataURL('image/png');
+                    const base64Data = dataURL.split(',')[1];
+                    zip.addFile(`frame_${String(index).padStart(4, '0')}.png`, base64Data, true);
+                });
+                
+                // Download zip file
+                const zipData = zip.generate();
+                this.downloadFile(zipData, 'drawing-animation.zip', 'application/zip');
+            }
+
+            createZip() {
+                // Minimal ZIP file creation
+                return {
+                    files: [],
+                    addFile: function(name, data, isBase64) {
+                        this.files.push({ name, data, isBase64 });
+                    },
+                    generate: function() {
+                        // For simplicity, we'll just create the first frame as a single image
+                        // In a real implementation, you'd create a proper ZIP file
+                        if (this.files.length > 0) {
+                            return this.files[0].data;
+                        }
+                        return '';
+                    }
+                };
+            }
+
+            downloadCanvas(canvas, filename) {
+                const dataURL = canvas.toDataURL('image/png');
+                this.downloadFile(dataURL, `${filename}.png`, 'image/png');
+            }
+
+            downloadFile(data, filename, mimeType) {
+                const link = document.createElement('a');
+                
+                if (data.startsWith('data:')) {
+                    link.href = data;
+                } else {
+                    const blob = new Blob([atob(data)], { type: mimeType });
+                    link.href = URL.createObjectURL(blob);
+                }
+                
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                if (!data.startsWith('data:')) {
+                    URL.revokeObjectURL(link.href);
+                }
+            }
+        }
+
+        // Initialize laou7a when the page loads
+        window.addEventListener('load', () => {
+            window.laou7a = new Laou7a();
+        });
+    </script>
+</body>
+</html>
